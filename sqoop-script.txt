@@ -1,0 +1,172 @@
+# https://www.tutorialspoint.com/sqoop/sqoop_import.htm
+
+# SQOOP - LIST DATABASES
+
+## Syntax
+
+$ sqoop list-databases (generic-args) (list-databases-args) 
+$ sqoop-list-databases (generic-args) (list-databases-args)
+
+## Sample Query
+
+$ sqoop list-databases \
+--connect jdbc:mysql://localhost/ \
+--username root
+
+# SQOOP - LIST TABLES
+
+## Syntax
+
+$ sqoop list-tables (generic-args) (list-tables-args) 
+$ sqoop-list-tables (generic-args) (list-tables-args)
+
+$ sqoop list-tables \
+--connect jdbc:mysql://localhost/userdb \
+--username root
+
+# SQOOP EVAL
+
+## Syntax
+
+$ sqoop eval (generic-args) (eval-args) 
+$ sqoop-eval (generic-args) (eval-args)
+
+## Select Query Evaluation
+
+$ sqoop eval \
+--connect jdbc:mysql://localhost/db \
+--username root \ 
+--query “SELECT * FROM employee LIMIT 3”
+
+## Insert Query Evaluation
+
+$ sqoop eval \
+--connect jdbc:mysql://localhost/db \
+--username root \ 
+-e “INSERT INTO employee VALUES(1207,‘Raju’,‘UI dev’,15000,‘TP’)”
+
+mysql>
+mysql> use db;
+mysql> SELECT * FROM employee;
+
+# SQOOP CODEGEN
+
+## Syntax
+
+$ sqoop codegen (generic-args) (codegen-args) 
+$ sqoop-codegen (generic-args) (codegen-args)
+
+$ sqoop codegen \
+--connect jdbc:mysql://localhost/userdb \
+--username root \ 
+--table emp
+
+$ cd /tmp/sqoop-hadoop/compile/9a300a1f94899df4a9b10f9935ed9f91/
+
+# SQOOP IMPORT
+
+## syntax 
+
+$ sqoop import (generic-args) (import-args) 
+$ sqoop-import (generic-args) (import-args)
+
+## IMPORTING DATA FROM MYSQL
+
+sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--table emp --m 1
+
+$HADOOP_HOME/bin/hadoop fs -cat /emp/part-m-*
+
+## Importing into Target Directory
+
+$ sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--table emp_add \
+--m 1 \
+--target-dir /queryresult
+
+$ $HADOOP_HOME/bin/hadoop fs -cat /queryresult/part-m-*
+
+## Import Subset of Table Data
+
+$ sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--table emp_add \
+--m 1 \
+--where “city =’sec-bad’” \
+--target-dir /wherequery
+
+$ $HADOOP_HOME/bin/hadoop fs -cat /wherequery/part-m-*
+
+## Incremental Import
+
+$ sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--table emp \
+--m 1 \
+--incremental append \
+--check-column id \
+-last value 1205
+
+$ $HADOOP_HOME/bin/hadoop fs -cat /emp/part-m-*
+$ $HADOOP_HOME/bin/hadoop fs -cat /emp/part-m-*1 # shows the newly added data
+
+## Import All Tables
+
+$ sqoop import-all-tables \
+--connect jdbc:mysql://localhost/userdb \
+--username root
+
+$ $HADOOP_HOME/bin/hadoop fs -ls
+
+# EXPORTING DATA TO MYSQL
+
+## Syntax
+
+$ sqoop export (generic-args) (export-args) 
+$ sqoop-export (generic-args) (export-args)
+
+$ mysql
+mysql> USE db;
+mysql> CREATE TABLE employee ( 
+   id INT NOT NULL PRIMARY KEY, 
+   name VARCHAR(20), 
+   deg VARCHAR(20),
+   salary INT,
+   dept VARCHAR(10));
+
+$ sqoop export \
+--connect jdbc:mysql://localhost/db \
+--username root \
+--table employee \ 
+--export-dir /emp/emp_data
+
+mysql>select * from employee;
+
+# SQOOP JOBS
+
+## Create Job (--create)
+
+$ sqoop job --create myjob \
+-- import \
+--connect jdbc:mysql://localhost/db \
+--username root \
+--table employee --m 1
+
+## Verify Job (--list)
+
+$ sqoop job --list
+
+## Inspect Job (--show)
+
+$ sqoop job --show myjob
+
+## Execute Job (--exec)
+
+$ sqoop job --exec myjob
+
