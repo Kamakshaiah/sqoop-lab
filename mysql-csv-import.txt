@@ -1,0 +1,100 @@
+# https://stackoverflow.com/questions/3635166/how-do-i-import-csv-file-into-a-mysql-table
+# https://dev.mysql.com/doc/refman/8.0/en/load-data.html [reference]
+
+mysql -u my_user_name -p
+
+use new_schema;
+
+CREATE TABLE employee_details (
+id INTEGER,
+employee_name VARCHAR(100),
+employee_age INTEGER,
+PRIMARY KEY (id)
+);
+
+LOAD DATA INFILE 'Path to the exported csv file'
+INTO TABLE employee_details
+FIELDS TERMINATED BY ','
+IGNORE 1 ROWS;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Orders.csv'   
+INTO TABLE orderdetails.orders 
+FIELDS TERMINATED BY ','  
+ ENCLOSED BY '"'
+ LINES TERMINATED BY '\n'
+ IGNORE 1 ROWS
+
+## Exercise 1
+
+CREATE TABLE 'CSVImport' (id INT);
+ALTER TABLE CSVImport ADD COLUMN Title VARCHAR(256);
+ALTER TABLE CSVImport ADD COLUMN Company VARCHAR(256);
+ALTER TABLE CSVImport ADD COLUMN NumTickets VARCHAR(256);
+...
+ALTER TABLE CSVImport Date49 ADD COLUMN Date49 VARCHAR(256);
+ALTER TABLE CSVImport Date50 ADD COLUMN Date50 VARCHAR(256);
+
+
+LOAD DATA INFILE "/home/paul/clientdata.csv"
+INTO TABLE CSVImport
+COLUMNS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+ESCAPED BY '"' ## this is not required ref. ex. 4
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+
+
+mysqlimport --ignore-lines=1 \
+            --fields-terminated-by=, \
+            --local -u root \
+            -p Database \
+             TableName.csv
+
+## Exercise 2 
+
+table of country with two columns CountryId,CountryName
+
+LOAD DATA INFILE 'c:/country.csv' 
+INTO TABLE country 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+
+## Exercise 3
+
+LOAD DATA LOCAL INFILE  
+'c:/temp/some-file.csv'
+INTO TABLE your_awesome_table  
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(field_1,field_2 , field_3);
+
+## Single line statements 
+
+LOAD DATA INFILE 'persondata.txt' INTO TABLE persondata (col1,col2,...);
+
+LOAD DATA LOCAL INFILE 'filename.csv' INTO TABLE table_name FIELDS TERMINATED BY ',' ENCLOSED BY '"' IGNORE 1 ROWS;
+
+## another solution is to use 'csvsql' tool from amazing 'csvkit' suite.
+
+pip install csvkit
+apt-get install python-dev libmysqlclient-dev
+pip install MySQL-python
+
+csvsql --db mysql://$user:$password@localhost/$database --insert --tables $tablename  $file
+
+## 'Error Code: 1290. The MySQL server is running with the --secure-file-priv option so it cannot execute this statement'
+
+### move file to secure file location
+
+SHOW VARIABLES LIKE "secure_file_priv";
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Orders.csv'   
+INTO TABLE orderdetails.orders 
+FIELDS TERMINATED BY ','  
+ ENCLOSED BY '"'
+ LINES TERMINATED BY '\n'
+ IGNORE 1 ROWS
